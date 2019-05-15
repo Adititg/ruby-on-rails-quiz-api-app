@@ -5,11 +5,13 @@ class JsonWebToken
      JWT.encode(payload, Rails.application.secrets.secret_key_base)
    end
 
-   def decode(token)
+    def decode(token)
      body = JWT.decode(token, Rails.application.secrets.secret_key_base)[0]
      HashWithIndifferentAccess.new body
-   rescue
-     nil
-   end
+    rescue JWT::ExpiredSignature, JWT::VerificationError => e
+      raise ExceptionHandler::ExpiredSignature, e.message
+    rescue JWT::DecodeError, JWT::VerificationError => e
+      raise ExceptionHandler::DecodeError, e.message
+    end
  end
 end
