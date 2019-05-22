@@ -1,7 +1,10 @@
 class UsersController < ApplicationController
-  skip_before_action :authenticate_request #, only: [:register, :authenticate]
+  #by pass authorization for register and login
+  skip_before_action :authenticate_request, only: [:register, :authenticate]
 
+  #action for login
  def login
+   #checking and generating token  
    command = AuthenticateUser.call(params[:email], params[:password])
     user = User.find_by(email: params[:email])
    if command.success?
@@ -11,7 +14,7 @@ class UsersController < ApplicationController
    end
  end
 
-
+#action for reg. the new user
  def register
   begin
     params.permit!
@@ -24,11 +27,13 @@ class UsersController < ApplicationController
   end  
  end
 
+  #for returning the question list for login user 
  def questions_list  
     #render json: {status: 200, questions: Quiz.all,  msg: "Success."}
      render json: {status: 200, questions: Quiz.all.map{|que| [id: que.id, question: que.question, options: [que.opt1,que.opt2,que.opt3,que.opt4], answer: que.answer]}.flatten,  msg: "Success."}
  end
-
+ 
+ #for returning the answer list on the basis of questions for login user
  def answer_list
    answers = Quiz.where(id: params[:ids]).map{|quiz| [quiz.id => quiz.answer]}
    render json: {status: 200, answers: answers.flatten,  msg: "Success."}

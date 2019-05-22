@@ -1,3 +1,4 @@
+#for authenticate the user
 class AuthenticateUser
   prepend SimpleCommand
   attr_accessor :email, :password
